@@ -103,10 +103,160 @@ if (isset($_GET['action'])) {
         </nav>
 
         <div id="content">
-            <!-- TODO: Mostrar contenido dinámico aquí dependiendo de la sección -->
-            
-            <h2>Sección Actual</h2>
-            <p>Implementar la visualización de datos aquí.</p>
+            <?php if ($action === 'libros'): ?>
+                <h2>Libros</h2>
+
+                <h3>Agregar libro</h3>
+                <form method="post" action="index.php">
+                    <input type="hidden" name="action" value="agregar_libro">
+                    <div>
+                        <label>Título:</label>
+                        <input type="text" name="titulo" required>
+                    </div>
+                    <div>
+                        <label>Autor:</label>
+                        <input type="text" name="autor" required>
+                    </div>
+                    <div>
+                        <label>ISBN:</label>
+                        <input type="text" name="isbn">
+                    </div>
+                    <div>
+                        <label>Cantidad:</label>
+                        <input type="number" name="cantidad" value="1" min="1">
+                    </div>
+                    <button type="submit">Agregar libro</button>
+                </form>
+
+                <h3>Listado de libros</h3>
+                <?php $libros = $biblioteca->obtenerLibros(); ?>
+                <table border="1" cellpadding="6" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>ISBN</th>
+                            <th>Cantidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($libros as $l): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($l['id']); ?></td>
+                                <td><?php echo htmlspecialchars($l['titulo']); ?></td>
+                                <td><?php echo htmlspecialchars($l['autor']); ?></td>
+                                <td><?php echo htmlspecialchars($l['isbn']); ?></td>
+                                <td><?php echo htmlspecialchars($l['cantidad']); ?></td>
+                                <td>
+                                    <a href="index.php?action=prestar&libro_id=<?php echo $l['id']; ?>">Prestar</a>
+                                    |
+                                    <a href="index.php?action=delete_libro&id=<?php echo $l['id']; ?>" onclick="return confirm('Eliminar libro?')">Eliminar</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+            <?php elseif ($action === 'usuarios'): ?>
+                <h2>Usuarios</h2>
+
+                <h3>Agregar usuario</h3>
+                <form method="post" action="index.php?action=usuarios">
+                    <input type="hidden" name="action" value="agregar_usuario">
+                    <div>
+                        <label>Nombre:</label>
+                        <input type="text" name="nombre" required>
+                    </div>
+                    <div>
+                        <label>Email:</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div>
+                        <label>Teléfono:</label>
+                        <input type="text" name="telefono">
+                    </div>
+                    <button type="submit">Agregar usuario</button>
+                </form>
+
+                <h3>Listado de usuarios</h3>
+                <?php $usuarios = $biblioteca->obtenerUsuarios(); ?>
+                <table border="1" cellpadding="6" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($usuarios as $u): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($u['id']); ?></td>
+                                <td><?php echo htmlspecialchars($u['nombre']); ?></td>
+                                <td><?php echo htmlspecialchars($u['email']); ?></td>
+                                <td><?php echo htmlspecialchars($u['telefono']); ?></td>
+                                <td>
+                                    <a href="index.php?action=delete_usuario&id=<?php echo $u['id']; ?>" onclick="return confirm('Eliminar usuario?')">Eliminar</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+            <?php elseif ($action === 'prestar' && isset($_GET['libro_id'])): ?>
+                <?php $libro_id = (int) $_GET['libro_id']; $libro = $biblioteca->buscarLibro($libro_id); ?>
+                <h2>Prestar libro: <?php echo htmlspecialchars($libro['titulo'] ?? '—'); ?></h2>
+
+                <form method="post" action="index.php">
+                    <input type="hidden" name="action" value="prestar_confirm">
+                    <input type="hidden" name="libro_id" value="<?php echo $libro_id; ?>">
+                    <div>
+                        <label>Usuario:</label>
+                        <select name="usuario_id" required>
+                            <option value="">-- seleccionar --</option>
+                            <?php foreach ($biblioteca->obtenerUsuarios() as $u): ?>
+                                <option value="<?php echo $u['id']; ?>"><?php echo htmlspecialchars($u['nombre']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <button type="submit">Confirmar préstamo</button>
+                </form>
+
+            <?php elseif ($action === 'prestamos'): ?>
+                <h2>Préstamos activos</h2>
+                <?php $prestamos = $biblioteca->obtenerPrestamosActivos(); ?>
+                <table border="1" cellpadding="6" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Libro</th>
+                            <th>Usuario</th>
+                            <th>Fecha préstamo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($prestamos as $p): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($p['id']); ?></td>
+                                <td><?php echo htmlspecialchars($p['titulo']); ?></td>
+                                <td><?php echo htmlspecialchars($p['nombre']); ?></td>
+                                <td><?php echo htmlspecialchars($p['fecha_prestamo']); ?></td>
+                                <td>
+                                    <a href="index.php?action=devolver&prestamo_id=<?php echo $p['id']; ?>">Devolver</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
+            <?php else: ?>
+                <h2>Sección no encontrada</h2>
+            <?php endif; ?>
             
             <!-- Ejemplo de estructura para lista -->
             <!-- 
