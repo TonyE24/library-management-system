@@ -6,6 +6,77 @@ $biblioteca = new Biblioteca();
 
 // TODO: Manejar lógica de enrutamiento o acciones (GET/POST)
 ?>
+<?php
+// Manejo de acciones (debe ejecutarse antes de cualquier salida)
+$action = isset($_GET['action']) ? $_GET['action'] : 'libros';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] === 'agregar_libro') {
+        $titulo = trim($_POST['titulo']);
+        $autor = trim($_POST['autor']);
+        $isbn = trim($_POST['isbn']);
+        $cantidad = (int) $_POST['cantidad'];
+
+        $libro = new Libro($titulo, $autor, $isbn, $cantidad);
+        $biblioteca->agregarLibro($libro);
+        header('Location: index.php');
+        exit;
+    }
+
+    if (isset($_POST['action']) && $_POST['action'] === 'agregar_usuario') {
+        $nombre = trim($_POST['nombre']);
+        $email = trim($_POST['email']);
+        $telefono = trim($_POST['telefono']);
+
+        $usuario = new Usuario($nombre, $email, $telefono);
+        $biblioteca->agregarUsuario($usuario);
+        header('Location: index.php?action=usuarios');
+        exit;
+    }
+
+    if (isset($_POST['action']) && $_POST['action'] === 'prestar_confirm') {
+        $libro_id = (int) $_POST['libro_id'];
+        $usuario_id = (int) $_POST['usuario_id'];
+        $biblioteca->prestarLibro($libro_id, $usuario_id);
+        header('Location: index.php?action=prestamos');
+        exit;
+    }
+}
+
+// Acciones tipo GET
+if (isset($_GET['action'])) {
+    if ($_GET['action'] === 'delete_libro' && isset($_GET['id'])) {
+        $biblioteca->eliminarLibro((int) $_GET['id']);
+        header('Location: index.php');
+        exit;
+    }
+
+    if ($_GET['action'] === 'delete_usuario' && isset($_GET['id'])) {
+        $biblioteca->eliminarUsuario((int) $_GET['id']);
+        header('Location: index.php?action=usuarios');
+        exit;
+    }
+
+    if ($_GET['action'] === 'prestar' && isset($_GET['libro_id'])) {
+        // mostrar formulario para elegir usuario (se maneja en la vista)
+        $action = 'prestar';
+    }
+
+    if ($_GET['action'] === 'devolver' && isset($_GET['prestamo_id'])) {
+        $biblioteca->devolverLibro((int) $_GET['prestamo_id']);
+        header('Location: index.php?action=prestamos');
+        exit;
+    }
+
+    if ($_GET['action'] === 'prestamos') {
+        $action = 'prestamos';
+    }
+
+    if ($_GET['action'] === 'usuarios') {
+        $action = 'usuarios';
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="es">
