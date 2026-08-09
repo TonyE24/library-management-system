@@ -34,6 +34,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if (isset($_POST['action']) && $_POST['action'] === 'editar_libro') {
+        $id = (int) $_POST['libro_id'];
+        $titulo = trim($_POST['titulo']);
+        $autor = trim($_POST['autor']);
+        $isbn = trim($_POST['isbn']);
+        $cantidad = (int) $_POST['cantidad'];
+
+        $datos = [
+            'titulo' => $titulo,
+            'autor' => $autor,
+            'isbn' => $isbn,
+            'cantidad' => $cantidad
+        ];
+
+        $biblioteca->editarLibro($id, $datos);
+        header('Location: index.php');
+        exit;
+    }
+
+    if (isset($_POST['action']) && $_POST['action'] === 'editar_usuario') {
+        $id = (int) $_POST['usuario_id'];
+        $nombre = trim($_POST['nombre']);
+        $email = trim($_POST['email']);
+        $telefono = trim($_POST['telefono']);
+
+        $datos = [
+            'nombre' => $nombre,
+            'email' => $email,
+            'telefono' => $telefono
+        ];
+
+        $biblioteca->editarUsuario($id, $datos);
+        header('Location: index.php?action=usuarios');
+        exit;
+    }
+
     if (isset($_POST['action']) && $_POST['action'] === 'prestar_confirm') {
         $libro_id = (int) $_POST['libro_id'];
         $usuario_id = (int) $_POST['usuario_id'];
@@ -58,8 +94,15 @@ if (isset($_GET['action'])) {
     }
 
     if ($_GET['action'] === 'prestar' && isset($_GET['libro_id'])) {
-        // mostrar formulario para elegir usuario (se maneja en la vista)
         $action = 'prestar';
+    }
+
+    if ($_GET['action'] === 'edit_libro' && isset($_GET['id'])) {
+        $action = 'edit_libro';
+    }
+
+    if ($_GET['action'] === 'edit_usuario' && isset($_GET['id'])) {
+        $action = 'edit_usuario';
     }
 
     if ($_GET['action'] === 'devolver' && isset($_GET['prestamo_id'])) {
@@ -152,6 +195,8 @@ if (isset($_GET['action'])) {
                                 <td>
                                     <a href="index.php?action=prestar&libro_id=<?php echo $l['id']; ?>">Prestar</a>
                                     |
+                                    <a href="index.php?action=edit_libro&id=<?php echo $l['id']; ?>">Editar</a>
+                                    |
                                     <a href="index.php?action=delete_libro&id=<?php echo $l['id']; ?>" onclick="return confirm('Eliminar libro?')">Eliminar</a>
                                 </td>
                             </tr>
@@ -200,12 +245,60 @@ if (isset($_GET['action'])) {
                                 <td><?php echo htmlspecialchars($u['email']); ?></td>
                                 <td><?php echo htmlspecialchars($u['telefono']); ?></td>
                                 <td>
+                                    <a href="index.php?action=edit_usuario&id=<?php echo $u['id']; ?>">Editar</a>
+                                    |
                                     <a href="index.php?action=delete_usuario&id=<?php echo $u['id']; ?>" onclick="return confirm('Eliminar usuario?')">Eliminar</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
+            <?php elseif ($action === 'edit_libro' && isset($_GET['id'])): ?>
+                <?php $libro_id = (int) $_GET['id']; $libro = $biblioteca->buscarLibro($libro_id); ?>
+                <h2>Editar libro</h2>
+                <form method="post" action="index.php">
+                    <input type="hidden" name="action" value="editar_libro">
+                    <input type="hidden" name="libro_id" value="<?php echo $libro_id; ?>">
+                    <div>
+                        <label>Título:</label>
+                        <input type="text" name="titulo" value="<?php echo htmlspecialchars($libro['titulo'] ?? ''); ?>" required>
+                    </div>
+                    <div>
+                        <label>Autor:</label>
+                        <input type="text" name="autor" value="<?php echo htmlspecialchars($libro['autor'] ?? ''); ?>" required>
+                    </div>
+                    <div>
+                        <label>ISBN:</label>
+                        <input type="text" name="isbn" value="<?php echo htmlspecialchars($libro['isbn'] ?? ''); ?>">
+                    </div>
+                    <div>
+                        <label>Cantidad:</label>
+                        <input type="number" name="cantidad" value="<?php echo htmlspecialchars($libro['cantidad'] ?? 1); ?>" min="1">
+                    </div>
+                    <button type="submit">Guardar cambios</button>
+                </form>
+
+            <?php elseif ($action === 'edit_usuario' && isset($_GET['id'])): ?>
+                <?php $usuario_id = (int) $_GET['id']; $usuario = $biblioteca->buscarUsuario($usuario_id); ?>
+                <h2>Editar usuario</h2>
+                <form method="post" action="index.php?action=usuarios">
+                    <input type="hidden" name="action" value="editar_usuario">
+                    <input type="hidden" name="usuario_id" value="<?php echo $usuario_id; ?>">
+                    <div>
+                        <label>Nombre:</label>
+                        <input type="text" name="nombre" value="<?php echo htmlspecialchars($usuario['nombre'] ?? ''); ?>" required>
+                    </div>
+                    <div>
+                        <label>Email:</label>
+                        <input type="email" name="email" value="<?php echo htmlspecialchars($usuario['email'] ?? ''); ?>" required>
+                    </div>
+                    <div>
+                        <label>Teléfono:</label>
+                        <input type="text" name="telefono" value="<?php echo htmlspecialchars($usuario['telefono'] ?? ''); ?>">
+                    </div>
+                    <button type="submit">Guardar cambios</button>
+                </form>
 
             <?php elseif ($action === 'prestar' && isset($_GET['libro_id'])): ?>
                 <?php $libro_id = (int) $_GET['libro_id']; $libro = $biblioteca->buscarLibro($libro_id); ?>

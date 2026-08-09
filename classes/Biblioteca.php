@@ -1,8 +1,8 @@
 <?php
-require_once 'Database.php';
-require_once 'Libro.php';
-require_once 'Usuario.php';
-require_once 'Prestamo.php';
+require_once __DIR__ . '/Database.php';
+require_once __DIR__ . '/Libro.php';
+require_once __DIR__ . '/Usuario.php';
+require_once __DIR__ . '/Prestamo.php';
 
 class Biblioteca {
     private $db;
@@ -100,6 +100,15 @@ class Biblioteca {
         $stmt->execute();
 
         return $stmt->fetchAll();
+    }
+
+    public function buscarUsuario($id) {
+        $query = "SELECT * FROM usuarios WHERE id = :id LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch();
     }
 
     public function prestarLibro($libro_id, $usuario_id) {
