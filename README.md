@@ -49,7 +49,12 @@ Si tu instalación de XAMPP usa otra contraseña, ajústala en ese archivo.
 4. En la sección de préstamos, usa “Devolver” para cerrar el préstamo.
 
 ## Capturas de pantalla
-Se recomienda capturar evidencia del sistema funcionando una vez ejecutado en XAMPP:
-- listado de libros
-- formulario de registro de usuario
-- listado de préstamos activos
+
+Coloca las imágenes en una carpeta como `docs/capturas/` con estos nombres para que se muestren en el README:
+
+![Vista de libros](docs/capturas/libros.png)
+
+![Vista de usuarios](docs/capturas/usuarios.png)
+
+![Vista de préstamos](docs/capturas/prestamos.png)
+
