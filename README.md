@@ -50,7 +50,6 @@ Si tu instalación de XAMPP usa otra contraseña, ajústala en ese archivo.
 
 ## Capturas de pantalla
 
-Coloca las imágenes en una carpeta como `docs/capturas/` con estos nombres para que se muestren en el README:
 
 ![Vista de libros](docs/capturas/libros.png)
 
