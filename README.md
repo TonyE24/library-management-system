@@ -50,10 +50,9 @@ Si tu instalación de XAMPP usa otra contraseña, ajústala en ese archivo.
 
 ## Capturas de pantalla
 
+![Vista de libros](docs/capturas/libros.svg)
 
-![Vista de libros](docs/capturas/libros.png)
+![Vista de usuarios](docs/capturas/usuarios.svg)
 
-![Vista de usuarios](docs/capturas/usuarios.png)
-
-![Vista de préstamos](docs/capturas/prestamos.png)
+![Vista de préstamos](docs/capturas/prestamos.svg)
 
